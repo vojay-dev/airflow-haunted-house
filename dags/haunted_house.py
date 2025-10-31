@@ -60,7 +60,7 @@ def haunted_house():
                     random_factor = random.uniform(-0.15, 0.15)
                     final_score = base_chance + random_factor
 
-                    passed = final_score > 0.4
+                    passed = final_score > 0.5
 
                     print(f"Fate decision for {scenario['room']} is {'passed' if passed else 'failed'}")
                     if not passed:
@@ -68,6 +68,7 @@ def haunted_house():
 
                 return fate_decision(j, scenario)
 
+            # noinspection PyTypeChecker
             chain(_encounter, [
                 fate_decision(0, f"{{{{ ti.xcom_pull(task_ids='generate_haunted_house')[{i}] }}}}"),
                 fate_decision(1, f"{{{{ ti.xcom_pull(task_ids='generate_haunted_house')[{i}] }}}}"),
@@ -82,7 +83,7 @@ def haunted_house():
         generate_encounter(1),
         generate_encounter(2),
         generate_encounter(3),
-        SmoothOperator(task_id="end", task_display_name="✅ YOU SURVIVED!")
+        SmoothOperator(task_id="end", task_display_name="✅ YOU SURVIVED!", trigger_rule="one_success")
     )
 
 haunted_house()
